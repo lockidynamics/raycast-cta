@@ -196,9 +196,9 @@ export async function getBusStops(routeId: string, direction: string): Promise<B
 export async function getBusRoutesByStop(stopId: string): Promise<string[]> {
   const cacheKey = getCacheKey("routesByStop", { stopId });
 
-  return getCachedData(
+  return getCachedData<string[]>(
     cacheKey,
-    CACHE_DURATION.PREDICTIONS, // Use predictions duration since this uses prediction endpoint
+    CACHE_DURATION.PREDICTIONS,
     async () => {
       try {
         const response = await fetch(
@@ -210,8 +210,8 @@ export async function getBusRoutesByStop(stopId: string): Promise<string[]> {
           return [];
         }
 
-        const predictions = data["bustime-response"].prd || [];
-        const routes = [...new Set(predictions.map((p: BusPrediction) => p.rt))];
+        const predictions = data["bustime-response"].prd as BusPrediction[] || [];
+        const routes = [...new Set(predictions.map((p) => p.rt))];
         return routes.sort();
       } catch (error) {
         console.error("Error fetching bus routes for stop:", error);
