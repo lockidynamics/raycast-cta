@@ -317,19 +317,10 @@ export default function Command(props: LaunchProps<{ arguments: CommandArguments
 
   const renderActions = (prediction: BusPrediction | TrainArrival) => {
     const stopId = transitType === "bus" ? (prediction as BusPrediction).stpid : (prediction as TrainArrival).staId;
-
     const stopName = transitType === "bus" ? (prediction as BusPrediction).stpnm : (prediction as TrainArrival).staNm;
 
     return (
       <ActionPanel>
-        <ActionPanel.Section>
-          <Action
-            icon={Icon.ArrowLeft}
-            title="Go Back"
-            shortcut={{ modifiers: ["cmd"], key: "[" }}
-            onAction={() => setSearchText("")}
-          />
-        </ActionPanel.Section>
         <ActionPanel.Section>
           <Action
             icon={Icon.Star}
