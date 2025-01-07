@@ -145,7 +145,13 @@ export default function Command(props: LaunchProps<{ arguments: CommandArguments
   const loadFavorites = async () => {
     setIsLoadingFavorites(true);
     const favs = await getFavoriteStops();
-    setFavorites(favs);
+    // Filter favorites based on available API keys
+    const filteredFavorites = favs.filter((favorite) => {
+      if (favorite.type === "bus" && !CTA_BUS_API_KEY) return false;
+      if (favorite.type === "train" && !CTA_TRAIN_API_KEY) return false;
+      return true;
+    });
+    setFavorites(filteredFavorites);
     setIsLoadingFavorites(false);
   };
 
@@ -318,13 +324,14 @@ export default function Command(props: LaunchProps<{ arguments: CommandArguments
   const renderActions = (prediction: BusPrediction | TrainArrival) => {
     const stopId = transitType === "bus" ? (prediction as BusPrediction).stpid : (prediction as TrainArrival).staId;
     const stopName = transitType === "bus" ? (prediction as BusPrediction).stpnm : (prediction as TrainArrival).staNm;
+    const isFavorite = favorites.some(f => f.id === stopId && f.type === transitType);
 
     return (
       <ActionPanel>
         <ActionPanel.Section>
           <Action
             icon={Icon.Star}
-            title="Toggle Favorite Stop"
+            title={isFavorite ? "Remove Favorite Stop" : "Add Favorite Stop"}
             shortcut={{ modifiers: ["cmd"], key: "f" }}
             onAction={() => toggleFavorite(stopId, transitType, stopName)}
           />
